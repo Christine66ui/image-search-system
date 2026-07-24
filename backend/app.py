@@ -257,8 +257,25 @@ def serve_static(filename):
     """静态文件服务"""
     return send_from_directory('static', filename)
 
+# 添加根路由用于健康检查
+@app.route('/')
+def health_check():
+    """健康检查端点"""
+    return jsonify({
+        'status': 'ok',
+        'service': 'image-search-api',
+        'model_loaded': model is not None,
+        'gallery_path': str(GALLERY_PATH)
+    })
+
 if __name__ == '__main__':
+    # 读取Railway动态分配的端口，默认5000
+    port = int(os.environ.get('PORT', 5000))
+
     print("Starting Image Search Server...")
     print(f"Gallery path: {GALLERY_PATH}")
-    print("Open http://localhost:5000 in your browser")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    print(f"Model loaded: {model is not None}")
+    print(f"Server running on port: {port}")
+
+    # 使用0.0.0.0让外部可以访问
+    app.run(host='0.0.0.0', port=port, debug=False)
