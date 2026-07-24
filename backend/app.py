@@ -37,13 +37,33 @@ print(f"INDEX_FILE: {INDEX_FILE}")
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# 加载ResNet50模型（移除最后的分类层，用于特征提取）
-print("Loading ResNet50 model...")
-model = resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
-# 移除最后的分类层，获取2048维特征向量
-model = nn.Sequential(*list(model.children())[:-1])
-model = model.to(DEVICE)
-model.eval()
+# 延迟加载的模型和索引
+model = None
+feature_index = {}
+model_loaded = False
+
+def load_model_async():
+    """异步加载模型和索引"""
+    global model, feature_index, model_loaded
+
+    print("Starting async model loading...")
+    try:
+        # 加载ResNet50模型
+        print("Loading ResNet50 model...")
+        model = resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
+        model = nn.Sequential(*list(model.children())[:-1])
+        model = model.to(DEVICE)
+        model.eval()
+        print("Model loaded successfully!")
+
+        # 加载索引
+        feature_index = load_index()
+        print(f"Index loaded with {len(feature_index)} images")
+
+        model_loaded = True
+        print("Async loading complete!")
+    except Exception as e:
+        print(f"Error during async loading: {e}")
 
 # 图像预处理（重点：转换为灰度图弱化颜色）
 def preprocess_image(image_path):
@@ -263,14 +283,31 @@ def health_check():
     """健康检查端点 - 直接返回200状态"""
     return 'OK', 200
 
+@app.route('/status')
+def status():
+    """返回应用和模型状态"""
+    return jsonify({
+        'status': 'running',
+        'model_loaded': model_loaded,
+        'gallery_path': str(GALLERY_PATH),
+        'indexed_images': len(feature_index)
+    })
+
 if __name__ == '__main__':
     # 读取Railway动态分配的端口，默认5000
     port = int(os.environ.get('PORT', 5000))
 
     print("Starting Image Search Server...")
     print(f"Gallery path: {GALLERY_PATH}")
-    print(f"Model loaded: {model is not None}")
     print(f"Server running on port: {port}")
+
+    # 启动异步模型加载
+    import threading
+    loading_thread = threading.Thread(target=load_model_async)
+    loading_thread.daemon = True
+    loading_thread.start()
+
+    print("Server started! Model loading in background...")
 
     # 使用0.0.0.0让外部可以访问
     app.run(host='0.0.0.0', port=port, debug=False)

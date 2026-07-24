@@ -4,9 +4,9 @@ builder = "NIXPACKS"
 [deploy]
 startCommand = "python backend/app.py"
 healthcheckPath = "/"
-healthcheckTimeout = 600
+healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
-startTimeout = 600
+startTimeout = 60
 
 [env]
 PORT = "5000"
