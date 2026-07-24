@@ -141,17 +141,17 @@ def load_index():
 feature_index = load_index()
 print(f"Loaded index with {len(feature_index)} images")
 
-@app.route('/')
-def index():
-    """返回前端页面"""
-    frontend_path = BASE_DIR / 'frontend' / 'index.html'
-    return send_file(str(frontend_path))
-
 @app.route('/test')
 def test():
     """返回测试页面"""
     test_path = BASE_DIR / 'test.html'
     return send_file(str(test_path))
+
+@app.route('/app')
+def frontend():
+    """返回前端页面"""
+    frontend_path = BASE_DIR / 'frontend' / 'index.html'
+    return send_file(str(frontend_path))
 
 @app.route('/api/search', methods=['POST'])
 def search():
@@ -257,16 +257,11 @@ def serve_static(filename):
     """静态文件服务"""
     return send_from_directory('static', filename)
 
-# 添加根路由用于健康检查
+# 根路由 - 直接返回HTTP 200，不做任何耗时操作
 @app.route('/')
 def health_check():
-    """健康检查端点"""
-    return jsonify({
-        'status': 'ok',
-        'service': 'image-search-api',
-        'model_loaded': model is not None,
-        'gallery_path': str(GALLERY_PATH)
-    })
+    """健康检查端点 - 直接返回200状态"""
+    return 'OK', 200
 
 if __name__ == '__main__':
     # 读取Railway动态分配的端口，默认5000
