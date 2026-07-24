@@ -30,6 +30,7 @@ uploads/*
 
 # 索引文件（可自动重建）
 backend/feature_index.json
+api/feature_index.json
 
 # 日志
 *.log
