@@ -17,5 +17,5 @@ COPY frontend/ ./frontend/
 # 暴露端口
 EXPOSE 5000
 
-# 启动命令
-CMD ["python", "backend/app.py"]
+# 启动命令 - 使用绝对路径确保正确启动
+CMD ["python", "/app/backend/app.py"]

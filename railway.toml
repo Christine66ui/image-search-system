@@ -3,7 +3,7 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "python backend/app.py"
+startCommand = "python /app/backend/app.py"
 healthcheckPath = "/"
 
 [env]
