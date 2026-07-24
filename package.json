@@ -1,0 +1,25 @@
+{
+  "name": "image-search-system",
+  "version": "1.0.0",
+  "description": "Product Image Search System with Vercel + Supabase",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "vercel build",
+    "start": "vercel start"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "vercel": "^32.5.0"
+  },
+  "keywords": [
+    "image-search",
+    "supabase",
+    "vercel",
+    "product-matching"
+  ],
+  "author": "",
+  "license": "MIT"
+}
